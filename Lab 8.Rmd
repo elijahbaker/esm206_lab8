@@ -1,0 +1,98 @@
+---
+title: "Lab_8"
+author: "E Baker"
+date: "11/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(modelsummary)
+library(corrplot)
+library(here)
+library(broom)
+
+```
+
+
+### Read in slo_homes.csv (from gauchosapce) 
+
+```{r}
+homes<- read_csv(here("slo_homes.csv"))
+```
+
+### Create a subset w/ 4 cities
+
+Task: create subset called "homes_subset" that only contains:
+-SLO
+-Atascadero
+-Arroyo Grande
+-Santa Maria-Orcutt
+
+```{r}
+homes_subset<- homes %>%
+  filter(City %in% c("San Luis Obispo", "Atascadero", "Arroyo Grande", "Santa Maria-Orcutt"))
+```
+
+### A little exploration
+Task: create a summary table that has the mean and standard deviation of home prices grouped by city and sale status
+```{r, include=FALSE, eval=FALSE}
+homes_subset %>%
+  group_by(City, Status) %>%
+  summarize(mean_price=mean(Price),
+                       sd_price= sd(Price),
+                       mean_sqft= mean(SqFt))
+            
+```
+
+
+Task: explore relationship beteen suqare footage and home price (from homes_subset) in a scatterplot
+
+```{r}
+ggplot(data = homes_subset, aes(x=SqFt, y= Price)) + 
+  geom_point() +
+  geom_smooth(method=lm)
+```
+
+### Try a few linear models
+Use multiple linear regression models to investigate relathionships between predictor variables and price.
+
+Create 2 permutations of this model:
+1) Price ~ City, Bedrooms, Bathrooms, SqFr, Status (lm1)
+2) Price ~ City, SqFt, Status (lm2)
+3) Try another (lm3)
+
+```{r}
+lm1<- lm(Price~ City + Bedrooms + Bathrooms + SqFt + Status, data =homes_subset)
+lm2<- lm(Price ~ City + SqFt + Status, data =homes_subset )
+lm3<- lm(Price~ City + SqFt, data =homes_subset)
+
+# If I Wanted SLO ti be the reference level, use:
+# fct_relevel to specify a new reference level
+
+### new_homes_subset <- fct_relevel<homes_subset$City, "San Luis Obispo"))
+
+```
+
+#WHOOPS
+
+
+### Explore correlations between quantitiative variables
+Task: make a subset called homes_quant (starting from homes_subset) that only contains variables Price - SqFt
+
+```{r}
+homes_quant <- homes_subset %>%
+  select(Price:SqFt)
+
+homes_cor <- cor(homes_quant)
+```
+
+
+
+```{r}
+
+```
+
+
